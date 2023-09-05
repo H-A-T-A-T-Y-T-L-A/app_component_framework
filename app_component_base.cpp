@@ -1,24 +1,12 @@
+#include "app_component_base.h"
 #include <vector>
 #include <string>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/event_groups.h"
-
+#include "freertos/semphr.h"
 #include "esp_check.h"
-
-#include "driver/gpio.h"
-#include "esp_heap_caps.h"
-#include "esp_netif.h"
-#include "esp_wifi.h"
 #include "esp_log.h"
-#include "esp_event.h"
-#include "esp_system.h"
-#include "nvs_flash.h"
-#include "mqtt_client.h"
 
-#include "app_component_base.h"
-
-#include "bsp/esp-bsp.h"
 
 // dispose
 TaskHandle_t AppComponentBase::dispose_task(SemaphoreHandle_t* finished_semaphore)

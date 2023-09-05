@@ -1,23 +1,12 @@
+#include "app_component_base.h"
+#include "app.h"
 #include <vector>
 #include <memory>
 #include <string>
-
-#include "app_component_base.h"
-#include "app.h"
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/event_groups.h"
-
-#include "driver/gpio.h"
-#include "esp_heap_caps.h"
-#include "esp_netif.h"
-#include "esp_wifi.h"
+#include "freertos/semphr.h"
 #include "esp_log.h"
-#include "esp_event.h"
-#include "esp_system.h"
-#include "nvs_flash.h"
-#include "mqtt_client.h"
 
 // component list management
 void App::add_component(AppComponentReference component, bool allow_multiple)
