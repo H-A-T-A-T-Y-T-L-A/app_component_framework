@@ -4,5 +4,4 @@ idf_component_register(
          "app.h"
          "app.cpp"
     INCLUDE_DIRS "."
-    REQUIRES ""
 )
