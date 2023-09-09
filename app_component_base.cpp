@@ -99,6 +99,7 @@ void AppComponentBase::init_task_wrapper(void* parameters)
     task_parameters->error = task_parameters->component_reference->init(static_cast<std::vector<AppComponentReference>*>(task_parameters->parameters));
 
     xSemaphoreGive(*(task_parameters->finished_semaphore));
+    xSemaphoreGive(task_parameters->component_reference->init_semaphore);
     vTaskDelete(NULL);
 }
 esp_err_t AppComponentBase::init(std::vector<AppComponentReference>* components)

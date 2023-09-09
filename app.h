@@ -10,6 +10,7 @@
 
 class App : public AppComponentBase {
     public:
+        App();
         void add_component(AppComponentReference component, bool must_be_unique = true);
         void remove_component(AppComponentReference component);
         const char* log_tag() override;

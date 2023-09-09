@@ -8,6 +8,10 @@
 #include "freertos/semphr.h"
 #include "esp_log.h"
 
+App::App():AppComponentBase()
+{
+}
+
 // component list management
 void App::add_component(AppComponentReference component, bool allow_multiple)
 {

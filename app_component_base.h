@@ -24,7 +24,7 @@ class AppComponentBase {
                 SemaphoreHandle_t* started_semaphore;
                 SemaphoreHandle_t* finished_semaphore;
         };
-
+        
         // dispose
         TaskHandle_t dispose_task(SemaphoreHandle_t* finished_semaphore);
         esp_err_t dispose(void);
@@ -33,16 +33,8 @@ class AppComponentBase {
         esp_err_t init(std::vector<AppComponentReference>* parameters);
 
         // search for component of type
-        template<typename T> std::shared_ptr<T> component()
-        {
-            for (AppComponentReference compRef : *components)
-            {
-                std::shared_ptr<T> found = std::dynamic_pointer_cast<T>(compRef);
-                if (found != nullptr)
-                    return found;
-            }
-            return nullptr;
-        }
+        template<typename T> std::shared_ptr<T> component();
+        template<typename T> esp_err_t await_init_of_component();
 
         // tag for logs and for checking uniquenes
         virtual const char* log_tag() = 0;
@@ -50,6 +42,9 @@ class AppComponentBase {
     protected:
         // pointer to components vector from the main app object
         std::vector<AppComponentReference>* components;
+        
+        // semaphore for other components to await the initialisation of this component
+        SemaphoreHandle_t init_semaphore = xSemaphoreCreateCounting(1, 0);
 
         // virtual methods for subclasses
         virtual esp_err_t init_self(void) = 0;
@@ -62,5 +57,29 @@ class AppComponentBase {
         // to not do init twice
         bool is_initialised = false;
 };
+
+template<typename T> esp_err_t AppComponentBase::await_init_of_component()
+{
+    AppComponentReference found_component = component<T>();
+    if (found_component == nullptr)
+        return ESP_ERR_NOT_FOUND;
+
+    while (xSemaphoreTake(found_component->init_semaphore, portMAX_DELAY) == pdFALSE)
+        vTaskDelay(10);
+
+    xSemaphoreGive(found_component->init_semaphore);
+    return ESP_OK;
+}
+
+template<typename T> std::shared_ptr<T> AppComponentBase::component()
+{
+    for (AppComponentReference compRef : *components)
+    {
+        std::shared_ptr<T> found = std::dynamic_pointer_cast<T>(compRef);
+        if (found != nullptr)
+            return found;
+    }
+    return nullptr;
+}
 
 #endif // COMPONENT_BASE_H
